@@ -13,13 +13,10 @@ public class AgentScript : MonoBehaviour
     public float rangoCaptura = 1.5f;
     public Transform sensorVista;
     public float tiempoPerdidaMax = 2f;
-
     public float tiempoFueraVista = 0f;
-    public bool enPersecucion = false;
-
+    bool enPersecucion = false;
     public Transform puntoMasCercano;
-    public float distanciaMinima;
-
+    float distanciaMinima;
     public NavMeshAgent navAgente;
     public Animator animador;
 

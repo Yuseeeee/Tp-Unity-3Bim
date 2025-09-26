@@ -1478,10 +1478,8 @@ MonoBehaviour:
   sensorVista: {fileID: 714562023}
   tiempoPerdidaMax: 2
   tiempoFueraVista: 0
-  enPersecucion: 0
   puntoMasCercano: {fileID: 0}
-  distanciaMinima: 0
-  navAgente: {fileID: 790442811}
+  navAgente: {fileID: 2130074503}
   animador: {fileID: 1978980603}
 --- !u!195 &790442811
 NavMeshAgent:
@@ -2720,6 +2718,7 @@ GameObject:
   - component: {fileID: 2130074506}
   - component: {fileID: 2130074505}
   - component: {fileID: 2130074504}
+  - component: {fileID: 2130074503}
   m_Layer: 0
   m_Name: Agente
   m_TagString: Untagged
@@ -2727,6 +2726,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!195 &2130074503
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2130074502}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 1
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!136 &2130074504
 CapsuleCollider:
   m_ObjectHideFlags: 0
