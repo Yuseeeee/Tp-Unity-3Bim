@@ -1,125 +1,128 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 
 public class AgentScript : MonoBehaviour
 {
     public Transform[] waypoints;
-    public int currentWaypoint = 0;
-    public float capacidadVision = 12f;
-    public NavMeshAgent agent;
-    public Animator anim;
-    public Transform player;
-    public float anguloVision = 60f;
-    public float distanciaPerseguir = 1.5f;
-    public Transform vistaNPC;
-    public float tiempoPerdidaVista = 2f;
-    public float tiempoSinVer = 0f;
-    public bool perseguir = false;
-    public Transform puntoCercano;
-    public float minDistancia;
+    public int indiceRuta = 0;
 
-    void Awake()
+    public Transform objetivo;
+    public float rangoVision = 10f;
+    public float rangoAngulo = 60f;
+    public float rangoCaptura = 1.5f;
+    public Transform sensorVista;
+    public float tiempoPerdidaMax = 2f;
+
+    public float tiempoFueraVista = 0f;
+    public bool enPersecucion = false;
+
+    public Transform puntoMasCercano;
+    public float distanciaMinima;
+
+    public NavMeshAgent navAgente;
+    public Animator animador;
+
+    private void Awake()
     {
-        agent = GetComponent<NavMeshAgent>();
-        anim = GetComponent<Animator>();
+        navAgente = GetComponent<NavMeshAgent>();
+        animador = GetComponent<Animator>();
     }
 
-    void Start()
+    private void Start()
     {
         if (waypoints.Length > 0)
         {
-            agent.SetDestination(waypoints[currentWaypoint].position);
+            navAgente.SetDestination(waypoints[indiceRuta].position);
         }
     }
 
-    void Update()
+    private void Update()
     {
-        anim.SetFloat("Speed", agent.velocity.magnitude);
+        animador.SetFloat("Speed", navAgente.velocity.magnitude);
 
-        if (perseguir)
+        if (enPersecucion)
         {
-            PerseguirPlayer();
+            SeguirObjetivo();
         }
         else
         {
-            Patrullar();
-            DetectPlayer();
+            PatrullarRuta();
+            VerificarObjetivo();
         }
     }
 
-    void Patrullar()
+    void PatrullarRuta()
     {
         if (waypoints.Length == 0) return;
 
-        if (!agent.pathPending && agent.remainingDistance < 0.5f)
+        if (!navAgente.pathPending && navAgente.remainingDistance < 0.5f)
         {
-            currentWaypoint = (currentWaypoint + 1) % waypoints.Length;
-            agent.SetDestination(waypoints[currentWaypoint].position);
+            indiceRuta = (indiceRuta + 1) % waypoints.Length;
+            navAgente.SetDestination(waypoints[indiceRuta].position);
         }
     }
 
-    void DetectPlayer()
+    void VerificarObjetivo()
     {
-        Vector3 direccion = (player.position - vistaNPC.position).normalized;
-        float distancia = Vector3.Distance(player.position, vistaNPC.position);
+        Vector3 direccion = (objetivo.position - sensorVista.position).normalized;
+        float distancia = Vector3.Distance(objetivo.position, sensorVista.position);
 
-        if (distancia <= capacidadVision)
+        if (distancia <= rangoVision)
         {
-            float angulo = Vector3.Angle(vistaNPC.forward, direccion);
-            if (angulo < anguloVision)
+            float angulo = Vector3.Angle(sensorVista.forward, direccion);
+            if (angulo < rangoAngulo)
             {
-                if (Physics.Raycast(vistaNPC.position, direccion, out RaycastHit hit, capacidadVision))
+                if (Physics.Raycast(sensorVista.position, direccion, out RaycastHit hit, rangoVision))
                 {
                     if (hit.collider.CompareTag("Player"))
                     {
-                        perseguir = true;
-                        tiempoSinVer = 0f;
+                        enPersecucion = true;
+                        tiempoFueraVista = 0f;
                     }
                 }
             }
         }
     }
 
-    void PerseguirPlayer()
+    void SeguirObjetivo()
     {
-        agent.SetDestination(player.position);
+        navAgente.SetDestination(objetivo.position);
 
-        float distancia = Vector3.Distance(transform.position, player.position);
-        if (distancia <= distanciaPerseguir)
+        float distancia = Vector3.Distance(transform.position, objetivo.position);
+        if (distancia <= rangoCaptura)
         {
             SceneManager.LoadScene("Perdiste");
         }
 
-        Vector3 direccion = (player.position - vistaNPC.position).normalized;
-        if (Physics.Raycast(vistaNPC.position, direccion, out RaycastHit hit, capacidadVision) && hit.collider.CompareTag("Player"))
+        Vector3 direccion = (objetivo.position - sensorVista.position).normalized;
+        if (Physics.Raycast(sensorVista.position, direccion, out RaycastHit hit, rangoVision) && hit.collider.CompareTag("Player"))
         {
-            tiempoSinVer = 0f;
+            tiempoFueraVista = 0f;
         }
         else
         {
-            tiempoSinVer += Time.deltaTime;
-            if (tiempoSinVer >= tiempoPerdidaVista)
+            tiempoFueraVista += Time.deltaTime;
+            if (tiempoFueraVista >= tiempoPerdidaMax)
             {
-                perseguir = false;
-                tiempoSinVer = 0f;
+                enPersecucion = false;
+                tiempoFueraVista = 0f;
 
                 if (waypoints.Length > 0)
                 {
-                    puntoCercano = waypoints[0];
-                    minDistancia = Vector3.Distance(transform.position, waypoints[0].position);
+                    puntoMasCercano = waypoints[0];
+                    distanciaMinima = Vector3.Distance(transform.position, waypoints[0].position);
 
                     foreach (Transform p in waypoints)
                     {
                         float d = Vector3.Distance(transform.position, p.position);
-                        if (d < minDistancia)
+                        if (d < distanciaMinima)
                         {
-                            minDistancia = d;
-                            puntoCercano = p;
+                            distanciaMinima = d;
+                            puntoMasCercano = p;
                         }
                     }
-                    agent.SetDestination(puntoCercano.position);
+                    navAgente.SetDestination(puntoMasCercano.position);
                 }
             }
         }

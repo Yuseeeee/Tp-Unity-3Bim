@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Animated_Character_Navigation_Final.unity
+    guid: 4b49219a45d9b6a4f97cd604b66abd8a
+  - enabled: 1
+    path: Assets/Scenes/Perdiste.unity
+    guid: 6b01292e50eeeef4fadd8f5b29e07715
   m_configObjects: {}
